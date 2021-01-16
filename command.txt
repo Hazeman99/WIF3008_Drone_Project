@@ -1,14 +1,44 @@
 command
+delay 3
+streamon
+delay 3
 takeoff
-delay 1
-up 20
-delay 1
-foward 20 
-delay 1
-right 20 
-delay 1
-back 20 
-delay 1
-left 20 
-delay 1
+delay 7
+forward 50
+delay 4
+ccw 150
+delay 4
+cw 90
+delay 4
+foward 100
+delay 4
+ccw 90
+delay 4
+forward 40
+delay 4
+ccw 90
+delay 4
+forward 80
+delay 4
+ccw 90
+delay 4
+forward 40
+delay 4
+ccw 90
+delay 4
+forward 40
+delay 4
+ccw 90
+delay 4
+forward 60
+delay 4
+ccw 150
+delay 4
+forward 50
+delay 4
+cw 180
+delay 4
 land
+delay 3
+streamoff
+delay 2

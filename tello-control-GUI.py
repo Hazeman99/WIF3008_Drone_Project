@@ -1,29 +1,42 @@
 # python3
 
-from tkinter import *
-from datetime import datetime
-import time
-from tello import Tello
 import sys
+import time
+from datetime import datetime
+from tkinter import *
+
+from main_tello import Tello
+
+import Perimeter_Sweep  
+# from easytello import Tello
+
+
+# my_drone = tello.Tello()
+
 
 tello = Tello()
 
-d='20'
-a='1'
+# tello.get_battery()
+# tello get_battery
+# tello.streamon()
+
+
+d = '20'
+a = '1'
 
 root = Tk()
-root.geometry("800x450+100+50")
+root.geometry("800x600+100+50")
 root.title('Tello Drone Control')
 
-frame0 = Frame(root,width=800, height=10)
+frame0 = Frame(root, width=800, height=20)
 frame_scale = Frame(root)
 
-frame12= Frame(root)
+frame12 = Frame(root)
 frame1 = Frame(frame12)
 frame2 = Frame(frame12)
 
 frame_flip = Frame(root)
-
+print('gui')
 
 button_command = Button(frame0, text='command', width=10, command=lambda: tello.send_command(
     'command')).grid(row=0, column=0, padx=90, pady=10)
@@ -31,6 +44,23 @@ button_takeoff = Button(frame0, text='takeoff', width=10, command=lambda: tello.
     'takeoff')).grid(row=0, column=1, padx=90, pady=10)
 button_land = Button(frame0, text='land', width=10, command=lambda: tello.send_command(
     'land')).grid(row=0, column=2, padx=90, pady=10)
+
+
+button_sweep = Button(frame0, text='sweep', width=10, command=lambda: Perimeter_Sweep.main()).grid(row=1, column=0, padx=90, pady=10)
+button_streamon = Button(frame0, text='stream on', width=10, command=lambda: tello.send_command(
+    'streamon')).grid(row=1, column=1, padx=90, pady=10)
+button_streamoff = Button(frame0, text='streamoff', width=10, command=lambda: tello.send_command(
+    'streamoff')).grid(row=1, column=2, padx=90, pady=10)
+
+
+# buttons to get stat
+button_battery = Button(frame0, text='battery', width=10, command=lambda: tello.get_battery()
+                        ).grid(row=2, column=0, padx=90, pady=10)
+
+button_speed = Button(frame0, text='speed', width=10, command=lambda: tello.get_speed()
+                      ).grid(row=2, column=1, padx=90, pady=10)
+button_height = Button(frame0, text='height', width=10, command=lambda: tello.get_height(
+)).grid(row=2, column=2, padx=90, pady=10)
 
 # buttons to control flying forward, back, left and right
 button_forward = Button(frame1, text='forward', height=1, width=8,
@@ -63,28 +93,39 @@ button_flip_r = Button(frame_flip, text='flip right', height=1, width=10,
                        command=lambda: tello.send_command('flip r')).grid(row=1, column=2)
 
 # scrollbar to set the angle to rotate
-angle_change=Scale(frame_scale,from_=1,to=360,orient=HORIZONTAL,tickinterval=60,resolution=1,length=200)
-angle_change.grid(row=0, column=1,padx=95)
+angle_change = Scale(frame_scale, from_=1, to=360,
+                     orient=HORIZONTAL, tickinterval=60, resolution=1, length=200)
+angle_change.grid(row=0, column=1, padx=95)
+
+
 def speed_change():
-    a=str(angle_change.get())
+    a = str(angle_change.get())
     print('rotate angle set: ', a)
-angle=Button(frame_scale,text='angle confirm',padx=4,command=angle_change)
+
+
+angle = Button(frame_scale, text='angle confirm', padx=4, command=angle_change)
 angle.grid(row=1, column=1)
 
 # scrollbar to set the distance to fly
-distance_change=Scale(frame_scale,from_=20,to=500,orient=HORIZONTAL,tickinterval=100,resolution=10,length=200)
-distance_change.grid(row=0, column=0,padx=95)
+distance_change = Scale(frame_scale, from_=20, to=500,
+                        orient=HORIZONTAL, tickinterval=100, resolution=10, length=200)
+distance_change.grid(row=0, column=0, padx=95)
+
+
 def speed_change():
-    d=str(distance_change.get())
+    d = str(distance_change.get())
     print('flying distance set: ', d)
-distance=Button(frame_scale,text='distance confirm',padx=4,command=speed_change)
+
+
+distance = Button(frame_scale, text='distance confirm',
+                  padx=4, command=speed_change)
 distance.grid(row=1, column=0)
 
 
 frame0.pack()
-frame_scale.pack( pady=20)
-frame1.grid(row=0, column=0,padx=80)
-frame2.grid(row=0, column=1,padx=80)
+frame_scale.pack(pady=20)
+frame1.grid(row=0, column=0, padx=80)
+frame2.grid(row=0, column=1, padx=80)
 frame12.pack(pady=0)
 frame_flip.pack(pady=30)
 

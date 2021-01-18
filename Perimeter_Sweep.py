@@ -1,12 +1,10 @@
 import time
 
-import main_tello
 
 
 def main(billy):
 
-    # Create Billy
-    # billy = main_tello.Tello()
+
 
     # Travel to/from starting checkpoint 0 from/to the charging base
     frombase = ["forward", 50, "ccw", 150]
@@ -20,12 +18,14 @@ def main(billy):
     if not billy.get_isSecondSweep:
         # Put Tello into command mode
         if billy.get_interrupt_status():
+            print("Interrupt - Manual Control On!")
             return
 
         billy.send_command("command", 3)
 
     # Send the takeoff command
     if billy.get_interrupt_status():
+        print("Interrupt - Manual Control On!")
         return
 
     if not billy.get_isSecondSweep:
@@ -38,6 +38,7 @@ def main(billy):
         print("From the charging base to the starting checkpoint of sweep pattern.\n")
     
     if billy.get_interrupt_status():
+        print("Interrupt - Manual Control On!")
         return
 
     if not billy.get_isSecondSweep:
@@ -54,7 +55,7 @@ def main(billy):
             if billy.get_interrupt_status():
                 billy.set_isSecondSweep(True)
                 billy.set_second_sweep_index(i);
-                print("Interrupt Clicked")
+                print("Interrupt - Manual Control On!")
                 return
             if i == len(checkpoint)-1:
                 print("Returning to Checkpoint 0. \n")
@@ -71,7 +72,7 @@ def main(billy):
             if billy.get_interrupt_status():
                 billy.set_isSecondSweep(True)
                 billy.set_second_sweep_index(i);
-                print("Interrupt Clicked")
+                print("Interrupt - Manual Control On!")
                 return
             if i == len(checkpoint)-1:
                 print("Returning to Checkpoint 0. \n")
@@ -87,6 +88,7 @@ def main(billy):
     # Reach back at Checkpoint 0
     print("Complete sweep. Return to charging base.\n")
     if billy.get_interrupt_status():
+        print("Interrupt - Manual Control On!")
         return
 
     billy.send_command(tobase[0] + " " + str(tobase[1]), 4)
@@ -96,18 +98,18 @@ def main(billy):
     # Turn to original direction before land
     print("Turn to original direction before land.\n")
     if billy.get_interrupt_status():
+        print("Interrupt - Manual Control On!")
         return
 
     billy.send_command("cw 180", 4)
 
     # Land
     if billy.get_interrupt_status():
+        print("Interrupt - Manual Control On!")
         return
     billy.send_command("land", 3)
 
 
-# Close the socket
-# billy.socket.close()
 
 if __name__ == "__main__":
     main()

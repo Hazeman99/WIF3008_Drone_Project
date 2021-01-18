@@ -36,7 +36,7 @@ class Tello:
         self.second_sweep_index = 0
         self.isSecondSweep = False
         # Setting Tello to command mode
-        self.command()
+        # self.command()
 
     def set_interrupt(self, bool):
         self.interrupt = bool
@@ -97,8 +97,8 @@ class Tello:
     def _video_thread(self):
         print("receiving video thread")
         # Creating stream capture object
-        # cap = cv2.VideoCapture('udp://@'+self.tello_ip+':11111')
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture('udp://@'+self.tello_ip+':11111')
+        # cap = cv2.VideoCapture(0)
         # Runs while 'stream_state' is True
         while self.stream_state:
             ret, frame = cap.read()
@@ -114,8 +114,10 @@ class Tello:
     def wait(self, delay: float):
         # Displaying wait message (if 'debug' is True)
         if self.debug is True:
-            print('Waiting {} seconds...'.format(delay))
+            pass
+            # print('Waiting {} seconds...'.format(delay))
         # Log entry for delay added
+
         self.log.append(Stats('wait', len(self.log)))
         # Delay is activated
         time.sleep(delay)

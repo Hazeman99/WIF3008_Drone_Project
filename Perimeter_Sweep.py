@@ -17,44 +17,72 @@ def main(billy):
                   [4, "ccw", 90, "forward", 40], [5, "cw", 90, "forward", 60], [0, "ccw", 90, "forward", 40]]
 
 
-    # Put Tello into command mode
-    if billy.get_interrupt_status():
-        return
+    if not billy.get_isSecondSweep:
+        # Put Tello into command mode
+        if billy.get_interrupt_status():
+            return
 
-    billy.send_command("command", 3)
+        billy.send_command("command", 3)
 
     # Send the takeoff command
     if billy.get_interrupt_status():
         return
 
-    billy.send_command("takeoff", 7)
+    if not billy.get_isSecondSweep:
+        billy.send_command("takeoff", 7)
 
     print("\n")
 
     # Start at checkpoint 1 and print destination
-    print("From the charging base to the starting checkpoint of sweep pattern.\n")
+    if not billy.get_isSecondSweep:
+        print("From the charging base to the starting checkpoint of sweep pattern.\n")
+    
     if billy.get_interrupt_status():
         return
 
-    billy.send_command(frombase[0] + " " + str(frombase[1]), 4)
-    billy.send_command(frombase[2] + " " + str(frombase[3]), 4)
+    if not billy.get_isSecondSweep:
+        billy.send_command(frombase[0] + " " + str(frombase[1]), 4)
+        billy.send_command(frombase[2] + " " + str(frombase[3]), 4)
+        print("Current location: Checkpoint 0 " + "\n")
 
-    print("Current location: Checkpoint 0 " + "\n")
+    if billy.get_isSecondSweep():
+        # Billy's flight path
+        print("Continuing Perimeter Sweep. \n")
+        print("Current location: Checkpoint " + str(billy.get_second_sweep_index()) + "\n")
 
+        for i in range(billy.get_second_sweep_index(), len(checkpoint)):
+            if billy.get_interrupt_status():
+                billy.set_isSecondSweep(True)
+                billy.set_second_sweep_index(i);
+                print("Interrupt Clicked")
+                return
+            if i == len(checkpoint)-1:
+                print("Returning to Checkpoint 0. \n")
 
-    # Billy's flight path
-    for i in range(len(checkpoint)):
-        if billy.get_interrupt_status():
-            return
-        if i == len(checkpoint)-1:
-            print("Returning to Checkpoint 0. \n")
+            billy.send_command(checkpoint[i][1] + " " + str(checkpoint[i][2]), 4)
+            billy.send_command(checkpoint[i][3] + " " + str(checkpoint[i][4]), 4)
 
-        billy.send_command(checkpoint[i][1] + " " + str(checkpoint[i][2]), 4)
-        billy.send_command(checkpoint[i][3] + " " + str(checkpoint[i][4]), 4)
+            print("Arrived at current location: Checkpoint " +
+                str(checkpoint[i][0]) + "\n")
+            time.sleep(4)
+    else:
+        # Billy's flight path
+        for i in range(len(checkpoint)):
+            if billy.get_interrupt_status():
+                billy.set_isSecondSweep(True)
+                billy.set_second_sweep_index(i);
+                print("Interrupt Clicked")
+                return
+            if i == len(checkpoint)-1:
+                print("Returning to Checkpoint 0. \n")
 
-        print("Arrived at current location: Checkpoint " +
-              str(checkpoint[i][0]) + "\n")
-        time.sleep(4)
+            billy.send_command(checkpoint[i][1] + " " + str(checkpoint[i][2]), 4)
+            billy.send_command(checkpoint[i][3] + " " + str(checkpoint[i][4]), 4)
+
+            print("Arrived at current location: Checkpoint " +
+                str(checkpoint[i][0]) + "\n")
+            time.sleep(4)
+    
 
     # Reach back at Checkpoint 0
     print("Complete sweep. Return to charging base.\n")

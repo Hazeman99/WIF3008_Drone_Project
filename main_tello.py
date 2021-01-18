@@ -33,6 +33,8 @@ class Tello:
         self.debug = debug
         self.ignore_connection_timeout = ignore_connection_timeout
         self.interrupt = False
+        self.second_sweep_index = 0
+        self.isSecondSweep = False
         # Setting Tello to command mode
         self.command()
 
@@ -41,6 +43,18 @@ class Tello:
 
     def get_interrupt_status(self):
         return self.interrupt
+
+    def set_isSecondSweep(self, bool):
+        self.isSecondSweep = bool
+
+    def get_isSecondSweep(self):
+        return self.isSecondSweep
+    
+    def set_second_sweep_index(self, num):
+        self.second_sweep_index = num
+
+    def get_second_sweep_index(self):
+        return self.second_sweep_index
 
     def send_command(self, command: str, query: bool = False):
         

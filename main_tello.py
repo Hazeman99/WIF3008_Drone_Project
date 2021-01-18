@@ -8,14 +8,14 @@ from stats import Stats
 
 
 class Tello:
-    def __init__(self, tello_ip: str='192.168.10.1', debug: bool=True):
+    def __init__(self, tello_ip: str = '192.168.10.1', debug: bool = True, ignore_connection_timeout=False):
         # Opening local UDP port on 8889 for Tello communication
         self.local_ip = ''
         self.local_port = 8889
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind((self.local_ip, self.local_port))
-        
+
         # Setting Tello ip and port info
         self.tello_ip = tello_ip
         self.tello_port = 8889
@@ -31,10 +31,20 @@ class Tello:
         self.stream_state = False
         self.MAX_TIME_OUT = 10.0
         self.debug = debug
+        self.ignore_connection_timeout = ignore_connection_timeout
+        self.interrupt = False
         # Setting Tello to command mode
         self.command()
 
-    def send_command(self, command: str, query: bool =False):
+    def set_interrupt(self, bool):
+        self.interrupt = bool
+
+    def get_interrupt_status(self):
+        return self.interrupt
+
+    def send_command(self, command: str, query: bool = False):
+        
+        self.set_interrupt(False)
         # New log entry created for the outbound command
         self.log.append(Stats(command, len(self.log)))
 
@@ -43,18 +53,23 @@ class Tello:
         # Displaying conformation message (if 'debug' os True)
         if self.debug is True:
             print('Sending command: {}'.format(command))
-            
+
         # Checking whether the command has timed out or not (based on value in 'MAX_TIME_OUT')
-        start = time.time()
-        while not self.log[-1].got_response():  # Runs while no repsonse has been received in log
-            now = time.time()
-            difference = now - start
-            if difference > self.MAX_TIME_OUT:
-                print('Connection timed out!')
-                break
+        if not(self.ignore_connection_timeout):
+            print("I'm here")
+            start = time.time()
+            # Runs while no repsonse has been received in log
+            while not self.log[-1].got_response():
+                now = time.time()
+                difference = now - start
+                if difference > self.MAX_TIME_OUT:
+                    print('Connection timed out!')
+                    break
         # Prints out Tello response (if 'debug' is True)
         if self.debug is True and query is False:
             print('Response: {}'.format(self.log[-1].get_response()))
+        
+        self.wait(1)
 
     def _receive_thread(self):
         while True:
@@ -81,7 +96,7 @@ class Tello:
                 break
         cap.release()
         cv2.destroyAllWindows()
-    
+
     def wait(self, delay: float):
         # Displaying wait message (if 'debug' is True)
         if self.debug is True:
@@ -90,14 +105,14 @@ class Tello:
         self.log.append(Stats('wait', len(self.log)))
         # Delay is activated
         time.sleep(delay)
-    
+
     def get_log(self):
         return self.log
 
     # Controll Commands
     def command(self):
         self.send_command('command')
-    
+
     def takeoff(self):
         self.send_command('takeoff')
 
@@ -118,7 +133,7 @@ class Tello:
 
     def emergency(self):
         self.send_command('emergency')
-    
+
     # Movement Commands
     def up(self, dist: int):
         self.send_command('up {}'.format(dist))
@@ -131,7 +146,7 @@ class Tello:
 
     def right(self, dist: int):
         self.send_command('right {}'.format(dist))
-        
+
     def forward(self, dist: int):
         self.send_command('forward {}'.format(dist))
 
@@ -140,7 +155,7 @@ class Tello:
 
     def cw(self, degr: int):
         self.send_command('cw {}'.format(degr))
-    
+
     def ccw(self, degr: int):
         self.send_command('ccw {}'.format(degr))
 
@@ -151,7 +166,8 @@ class Tello:
         self.send_command('go {} {} {} {}'.format(x, y, z, speed))
 
     def curve(self, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int, speed: int):
-        self.send_command('curve {} {} {} {} {} {} {}'.format(x1, y1, z1, x2, y2, z2, speed))
+        self.send_command('curve {} {} {} {} {} {} {}'.format(
+            x1, y1, z1, x2, y2, z2, speed))
 
     # Set Commands
     def set_speed(self, speed: int):
@@ -180,7 +196,7 @@ class Tello:
     def get_height(self):
         self.send_command('height?', True)
         return self.log[-1].get_response()
-    
+
     def get_temp(self):
         self.send_command('temp?', True)
         return self.log[-1].get_response()
@@ -196,7 +212,7 @@ class Tello:
     def get_acceleration(self):
         self.send_command('acceleration?', True)
         return self.log[-1].get_response()
-    
+
     def get_tof(self):
         self.send_command('tof?', True)
         return self.log[-1].get_response()
@@ -204,4 +220,3 @@ class Tello:
     def get_wifi(self):
         self.send_command('wifi?', True)
         return self.log[-1].get_response()
-    
